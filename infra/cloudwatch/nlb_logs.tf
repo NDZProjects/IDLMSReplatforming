@@ -1,19 +1,22 @@
-#resource "random_string" "suffix" {
- # length  = 6
-  #upper   = false
-  #special = false
-#}
-
 data "aws_caller_identity" "current" {}
 
-
 resource "aws_s3_bucket" "nlb_logs" {
-  bucket        = "nlb-access-logs-stage-nyo9xe"
+  bucket        = "nlb-access-logs-${var.environment}-nyo9xe"
   force_destroy = true
 
   tags = {
     Name        = "NLB Access Logs"
     Environment = var.environment
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  bucket = aws_s3_bucket.nlb_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
   }
 }
 
@@ -32,13 +35,15 @@ resource "aws_s3_bucket_policy" "nlb_logs_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowELBLogging",
+        Sid       = "AllowELBLoggingPut",
         Effect    = "Allow",
         Principal = {
           Service = "logdelivery.elasticloadbalancing.amazonaws.com"
         },
-        Action    = "s3:PutObject",
-        Resource  = "${aws_s3_bucket.nlb_logs.arn}/${var.access_logs_prefix}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+        Action = [
+          "s3:PutObject"
+        ],
+        Resource = "${aws_s3_bucket.nlb_logs.arn}/*",
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
@@ -47,8 +52,16 @@ resource "aws_s3_bucket_policy" "nlb_logs_policy" {
             "aws:SourceArn" = "arn:aws:elasticloadbalancing:${var.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*"
           }
         }
+      },
+      {
+        Sid       = "AllowELBLoggingList",
+        Effect    = "Allow",
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        },
+        Action = "s3:ListBucket",
+        Resource = aws_s3_bucket.nlb_logs.arn
       }
     ]
-  }) # <-- this closes the jsonencode function
+  })
 }
-
