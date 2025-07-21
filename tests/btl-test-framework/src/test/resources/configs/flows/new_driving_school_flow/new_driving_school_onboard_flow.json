@@ -12,8 +12,8 @@
       "Driving school onboarding should succeed with status 201.",
       "Driving school application payment should succeed with status 201.",
       "Payment verification by system should succeed with status 201.",
-      "Payment status update by system should succeed with status 201.",
       "Payment status validation by system should succeed with status 201.",
+      "Payment status update by system should succeed with status 201.",
       "Driving school completing application for school onboarding should succeed with status 201.",
       "Inspection Request from driving school should succeed with status 201.",
       "Inspection Request acknowledgement via Lasdri admin should succeed with status 201."
