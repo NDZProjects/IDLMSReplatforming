@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "epic": "Mobile MVAA",
+    "feature": "Registrations Flow",
+    "severity": "normal",
+    "tags": [
+    ],
+    "expectedResults": [
+      "Get license registration by agent returns status code 200"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Get License Registration By Agent",
+      "name": "registration_by_agent: get license registration by agents",
+      "method": "GET",
+      "path": "license/registrations-by-agent",
+      "requires": [
+        "mvaa_agent_token"
+      ],
+      "query": {
+        "page": "1",
+        "resultsPerPage": "10",
+        "order": "ASC"
+      },
+      "assertions": {
+        "status": 200,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    }
+  ]
+}
