@@ -1,5 +1,8 @@
 [
   "../auth_flows/super_admin.json",
+  "../auth_flows/mvaa_agent.json",
   "device_onboarding.json",
-  "biometric_capture.json"
+  "biometric_capture.json",
+  "new_registrations.json",
+  "registration_by_agent.json"
 ]
