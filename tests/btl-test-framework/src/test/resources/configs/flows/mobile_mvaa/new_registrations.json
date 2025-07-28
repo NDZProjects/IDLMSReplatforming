@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "epic": "Mobile MVAA",
+    "feature": "New Registrations",
+    "severity": "normal",
+    "tags": [
+      "regression",
+      "mobile",
+      "mvaa"
+    ],
+    "expectedResults": [
+      "Verify driving school certificate returns status 200",
+      "Verify license returns status code 201",
+      "Submit new registration returns status code 201"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Validates the driving school certificate of the user",
+      "name": "self_service_verify_license: verify driving school certificate",
+      "method": "POST",
+      "path": "driving-school/validate-cert-no",
+      "body": {
+        "certificateNo": "${certificateNo}"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Validates the license number of the user",
+      "name": "self_service_verify_license: verify license",
+      "method": "POST",
+      "path": "license/verify",
+      "body": {
+        "licenseNo": "${licenseNo}",
+        "studentCertNo": null
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Submit New Registration",
+      "name": "self_service_verify_license: Submit New Registration",
+      "method": "POST",
+      "path": "license/pre-registration",
+      "body": {
+        "cbtCenterId": 7,
+        "stateId": 25,
+        "lgaId": 518,
+        "certificateNo": "DRY1/LA/046523/918724",
+        "date": "2025-07-26",
+        "time": "09:00:00",
+        "years": 5,
+        "licenseClassId": 1,
+        "files": [
+        ],
+        "successRedirectUrl": "https://localhost:3000/self-service/driving-school/application/payment/gateway",
+        "failureRedirectUrl": "https://localhost:3000/self-service/driving-school/application/payment/gateway"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    }
+  ]
+}
