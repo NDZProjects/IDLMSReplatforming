@@ -1,7 +1,7 @@
 {
   "metadata": {
     "epic": "Mobile DVIS",
-    "feature": "Driving Test",
+    "feature": "Driving Test Renewal",
     "severity": "critical",
     "tags": [
       "driving_test",
@@ -12,7 +12,7 @@
     "expectedResults": [
       "Send OTP returns status 201.",
       "Validate OTP returns status 201.",
-      "License pre-registration returns status 201.",
+      "Verify license returns status code 201",
       "Driving test submission returns status 201."
     ]
   },
@@ -25,7 +25,9 @@
       "body": {
         "email": "vickkycodegenius@gmail.com"
       },
-      "requires": ["super_admin_token"],
+      "requires": [
+        "super_admin_token"
+      ],
       "assertions": {
         "status": 201
       }
@@ -39,22 +41,57 @@
         "email": "vickkycodegenius@gmail.com",
         "otp": "377101"
       },
-      "requires": ["super_admin_token"],
+      "requires": [
+        "super_admin_token"
+      ],
       "assertions": {
         "status": 201
       }
     },
     {
-      "story": "License Pre-Registration",
-      "name": "driving_test_flow: License Pre-Registration",
+      "story": "Validates the license number of the user",
+      "name": "driving_test_flow: verify license",
       "method": "POST",
-      "path": "license/single/pre-registration",
+      "path": "license/verify",
       "body": {
-        "applicationNo": "DRY1/LA/046523/918724"
+        "licenseNo": "${licenseNo}",
+        "studentCertNo": null
       },
-      "requires": ["super_admin_token"],
+      "extract": {
+        "student_email": "data.email"
+      },
       "assertions": {
-        "status": 201
+        "status": 201,
+        "body": {
+          "success": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Student makes application payment",
+      "name": "driving_test_flow: Student makes application payment",
+      "method": "POST",
+      "path": "payments/initiate",
+      "body": {
+        "type": "pre_registration_payment",
+        "email": "${student_email}",
+        "description": "Payment licence pre registration",
+        "successRedirectUrl": "https://localhost:3000/payment/gateway/success",
+        "failureRedirectUrl": "https://localhost:3000/payment/gateway/failure"
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "reference": {
+            "exists": true
+          }
+        }
       }
     },
     {
@@ -63,6 +100,7 @@
       "method": "POST",
       "path": "driving-test/submit-driving-test",
       "body": {
+        "certificateNo": "${certificateNo}",
         "applicationNo": "DRLP/2025/849367",
         "score": 91,
         "answers": [
@@ -87,7 +125,9 @@
           }
         ]
       },
-      "requires": ["super_admin_token"],
+      "requires": [
+        "super_admin_token"
+      ],
       "assertions": {
         "status": 201
       }
