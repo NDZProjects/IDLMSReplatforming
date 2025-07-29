@@ -1,5 +1,6 @@
 [
   "../auth_flows/super_admin.json",
   "mobile.json",
-  "mobile_lasdri.json"
+  "mobile_lasdri.json",
+  "driving_test_renewal_flows.json"
 ]
