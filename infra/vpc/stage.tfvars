@@ -1,9 +1,9 @@
 environment = "stage"
-region      = "us-east-1"
+region      = "eu-west-1"
 ec2_ssm_profile_name = "stage-ec2_ssm_profile"
 ec2_ssm_role_name    = "ec2_ssm_role-stage"
-tf_state_bucket      = "my-terraform-state-bckt43"
-ami_id               = "ami-002d575a01b3b0003"
+tf_state_bucket      = "stage-btl-idlms-backend-api-tfstate"
+ami_id               = "ami-0914547665e6a707c" 
 docker_artifact_bucket = "idlms-website-built-artifact"
 
 enable_dns_support   = true
@@ -24,7 +24,7 @@ nat_gateway_name           = "stage-idlms-ngw"
 
 public_subnets = {
   cidrs_blocks         = ["10.122.1.0/24", "10.122.2.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b"]
   subnets_name_prefix  = "stage-public"
   route_table_name     = "stage-public"
   map_public_ip_on_launch = true
@@ -33,7 +33,7 @@ public_subnets = {
 
 private_subnets = {
   cidrs_blocks         = ["10.122.10.0/24", "10.122.20.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b"]
   subnets_name_prefix  = "stage-private"
   route_table_name     = "stage-private"
   routes               = []
@@ -41,7 +41,7 @@ private_subnets = {
 
 private_lb_subnets = {
   cidrs_blocks         = ["10.121.15.0/26", "10.121.15.64/26", "10.121.15.128/26"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "stage-lb"
   route_table_name     = "stage-lb"
   routes               = []
@@ -49,7 +49,7 @@ private_lb_subnets = {
 
 private_app_subnets = {
   cidrs_blocks         = ["10.121.16.0/22", "10.121.20.0/22", "10.121.24.0/22"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "stage-app"
   route_table_name     = "stage-app"
   routes               = []
@@ -57,7 +57,7 @@ private_app_subnets = {
 
 private_data_subnets = {
   cidrs_blocks         = ["10.121.40.0/24", "10.121.41.0/24", "10.121.42.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "stage-data"
   route_table_name     = "stage-data"
   routes               = []
@@ -66,7 +66,7 @@ private_data_subnets = {
 
 private_services_subnets = {
   cidrs_blocks         = ["10.121.254.0/26", "10.121.254.64/26", "10.121.254.128/26"]
-  availability_zones   = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones   = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   subnets_name_prefix  = "stage-service"
   route_table_name     = "stage-service"
   routes               = []
