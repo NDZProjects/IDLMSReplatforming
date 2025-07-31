@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "docker_backup" {
   bucket = "idlms-website-built-artifact"
-  force_destroy = true
+
   tags = {
     Name        = "IDLMS Docker Backup"
     Environment = var.environment
