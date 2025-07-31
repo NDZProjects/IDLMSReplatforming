@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "epic": "Acknowledge Driving Lesson Application",
+    "feature": "Acknowledge Application",
+    "severity": "Critical",
+    "tags": [
+      "Application",
+      "Acknowledge"
+    ],
+    "expectedResults": [
+      "Table containing driving school applications should be displayed",
+      "Driving school admin should successfully view the student's application profile",
+      "Driving school admin should successfully acknowlegde the driving training application"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Application module",
+      "name": "Admin accesses table/list of applications",
+      "method": "GET",
+      "path": "users/driving-school-application",
+      "requires": [
+        "school_admin_token"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Table containing driving school applications should be displayed"
+      ]
+    },
+    {
+      "story": "Students application profile",
+      "name": "Admin opens/view applicant's profile",
+      "method": "GET",
+      "path": "driving-school/applicant/details/331",
+      "requires": [
+        "school_admin_token"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Driving school admin should successfully view the student's application profile"
+      ]
+    },
+    {
+      "story": "Acknowledgement",
+      "name": "Admin acknowledges the application",
+      "method": "POST",
+      "path": "driving-school/change-application-status",
+      "requires": [
+        "school_admin_token"
+      ],
+      "body": {
+        "status": 1,
+        "applicationId": "${applicationID}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "studentNo": "data.studentNo"
+      },
+      "expectedResults": [
+        "Driving school admin should successfully acknowlegde the driving training application"
+      ]
+    }
+  ]
+}

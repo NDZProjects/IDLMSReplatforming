@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "epic": "Student Account Creation",
+    "feature": "Create Account",
+    "severity": "Critical",
+    "tags": [
+      "Account",
+      "create"
+    ],
+    "expectedResults": [
+      "Applicant should successfully access the public portal",
+      "OTP successfully sent to the applicant email address",
+      "Successfully validating user email address via OTP",
+      "Applicant's account should be successfully created",
+      "Applicant should successfully login to the student portal"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Start registration",
+      "name": "Start registration from public portal",
+      "method": "GET",
+      "path": "driving-school",
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Display account creation page"
+      ]
+    },
+    {
+      "story": "Send OTP",
+      "name": "Send OTP to email address",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "User should receive OTP via email"
+      ]
+    },
+    {
+      "story": "Validate OTP",
+      "name": "Validate OTP from email address",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "otp": "123456"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "OTP should be successfully validated"
+      ]
+    },
+    {
+      "story": "Account creation",
+      "name": "Applicant 's account successfully created",
+      "method": "POST",
+      "path": "auth/self-service/register",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "password": "Password@1234",
+        "confirmPassword": "Password@1234"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Applicant's account should be successfullly created"
+      ]
+    },
+    {
+      "story": "Login",
+      "name": "Login to the the student portal",
+      "method": "POST",
+      "path": "auth/self-service/login",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "password": "Password@1234"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Applicant should successfully login into his account"
+      ]
+    }
+  ]
+}

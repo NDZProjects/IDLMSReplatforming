@@ -1,0 +1,250 @@
+{
+  "metadata": {
+    "epic": "Student driving school enrollment",
+    "feature": "Enroll into driving school",
+    "severity": "Critical",
+    "tags": [
+      "Driving school",
+      "enrollment",
+      "NIN"
+    ],
+    "expectedResults": [
+      "Driving school admin should successfully access the application page",
+      "School admin should successfully select the training class required by the applicant",
+      "Applicant should successfully receive OTP via phone number",
+      "The OTP received via the applicant's phone number should be successfully validated",
+      "Applicant should successfully receive OTP via email address",
+      "The OTP received via the applicant's email address should be successfully validated",
+      "Applicant's NIN should be successfully validated",
+      "Admin should successfully make payment for the applicant",
+      "System should successfully verify the payment",
+      "The applicant should be successfully registered"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Driving lesson application",
+      "name": "Driving school admin accesses the school application page",
+      "method": "GET",
+      "path": "users/driving-school-application",
+      "requires": [
+        "school_admin_token"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Driving school admin should successfully access the application page"
+      ]
+    },
+    {
+      "story": "Training class",
+      "name": "Driving school admin selects applicant's driving training class",
+      "method": "GET",
+      "path": "driving-school/get-license-classes-by-vehicle-types",
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "School admin should successfully select the training class required by the applicant"
+      ],
+      "query": {
+        "vehicleTypes": "sedan"
+      }
+    },
+    {
+      "story": "Send OTP to phone number",
+      "name": "OTP sent to phone number",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "phone": "${studentPhoneSelfRegistration}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Applicant should successfully receive OTP via phone number"
+      ]
+    },
+    {
+      "story": "Validate phone number",
+      "name": "Validate OTP sent to phone number",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "phone": "${studentPhoneSelfRegistration}",
+        "otp": "123456"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "The OTP received via the applicant's phone number should be successfully validated"
+      ]
+    },
+    {
+      "story": "Send OTP to email address",
+      "name": "OTP sent email address",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "${studentEmailSelfRegistration}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Applicant should successfully receive OTP via email address"
+      ]
+    },
+    {
+      "story": "Validate email address",
+      "name": "Validate OTP sent to emial address",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "${studentEmailSelfRegistration}",
+        "otp": "123456"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "The OTP received via the applicant's email address should be successfully validated"
+      ]
+    },
+    {
+      "story": "NIN validation",
+      "name": "Applicant carries NIN validation",
+      "method": "GET",
+      "path": "auth/verify-nin/74952085147",
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Applicant's NIN should be successfully validated"
+      ]
+    },
+    {
+      "story": "Initiate payment",
+      "name": "Applicant makes application payment",
+      "method": "POST",
+      "path": "payments/initiate",
+      "body": {
+        "type": "driving_school_application_payment",
+        "email": "${studentEmailSelfRegistration}",
+        "description": "Payment for Driving School application",
+        "successRedirectUrl": "https://drivingschools.verxid.site/students/validation?class=First TimerApplicant&step=2",
+        "failureRedirectUrl": "https://drivingschools.verxid.site/students/complete-registration?failureRedirectModal=true"
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Admin should successfully make payment for the applicant"
+      ]
+    },
+    {
+      "story": "Verify payment",
+      "name": "System verifies payment",
+      "method": "POST",
+      "path": "payments/verify",
+      "body": {
+        "reference": "${paymentReference}",
+        "type": "driving_school_application_payment"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "System should successfully verify the payment"
+      ]
+    },
+    {
+      "story": "System updates payments",
+      "name": "new_driving_school_flow: system updates payment",
+      "method": "POST",
+      "path": "payments/update",
+      "requires": [
+        "paymentReference"
+      ],
+      "body": {
+        "type": "driving_school_application_payment",
+        "reference": "${paymentReference}",
+        "status": "completed",
+        "used": 0
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "success": false,
+          "message": "Record updated successfully",
+          "data.reference": {
+            "exists": true
+          }
+        }
+      }
+    },
+    {
+      "story": "Submit driving lesson application",
+      "name": "Applicant submits driving lesson application",
+      "method": "POST",
+      "path": "driving-school/students/register",
+      "requires": [
+        "school_admin_token"
+      ],
+      "body": {
+        "nin": "74952085147",
+        "reference": "${paymentReference}",
+        "titleId": 1,
+        "drivingSchoolId": 14,
+        "firstName": "Valentine",
+        "lastName": "Ogoshi",
+        "middleName": "",
+        "maidenName": "Omadefu",
+        "genderId": 1,
+        "nationalityId": 1,
+        "placeOfBirth": "515",
+        "dateOfBirth": "20-01-1990",
+        "maritalStatusId": 1,
+        "bloodGroupId": 8,
+        "occupationId": 1,
+        "email": "${studentEmailSelfRegistration}",
+        "phone": "${studentPhoneSelfRegistration}",
+        "stateOfOriginId": 25,
+        "lgaOfOriginId": 521,
+        "files": [
+          {
+            "fileId": 1662,
+            "documentType": "face"
+          }
+        ],
+        "nextOfKinName": "Damian",
+        "nextOfKinPhone": "09039528301",
+        "nextOfKinRelationshipId": 8,
+        "nextOfKinNationalityId": 1,
+        "facialMarks": "no",
+        "disability": "no",
+        "glasses": "no",
+        "height": 7,
+        "weight": 80,
+        "specifiedDisability": "",
+        "residentialStateId": null,
+        "residentialLgaId": null,
+        "lineAddress": "Naraguta",
+        "address": "Naraguta",
+        "trainingDurationId": null
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "The applicant should be successfully registered"
+      ]
+    }
+  ]
+}
