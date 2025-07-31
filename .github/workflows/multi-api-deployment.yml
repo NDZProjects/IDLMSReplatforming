@@ -14,7 +14,7 @@ on:
 env:
   AWS_REGION: eu-west-1
   TF_BUCKET: my-terraform-state-bckt4321
-  BACKUP_BUCKET: idlms-${var.environment}-built-artifact-
+  BACKUP_BUCKET: idlms-${{ github.event.inputs.ENV }}-built-artifact-
 
 jobs:
   deploy:
