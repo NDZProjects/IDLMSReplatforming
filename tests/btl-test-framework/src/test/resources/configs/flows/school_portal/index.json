@@ -1,0 +1,9 @@
+[
+  "../auth_flows/school_admin.json",
+  "Student_driving_school_account_creation.json",
+  "student_driving_training_enrolment_flow.json",
+  "acknowledge_driving_lesson_application_flow.json",
+  "school_portal_certify_student.json",
+  "dsportal_student_driving_training_enrollment.json",
+  "school_portal_certify_student.json"
+]

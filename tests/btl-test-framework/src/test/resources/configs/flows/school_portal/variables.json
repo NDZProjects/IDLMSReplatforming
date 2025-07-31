@@ -1,0 +1,5 @@
+{
+  "studentEmailDrivingSchool": "Agyakoji+${numericString:5}@gmail.com",
+  "studentEmailSelfRegistration": "Agyakoji.${numericString:5}@gmail.com",
+  "studentPhoneSelfRegistration": "${phoneNumber:090,11}"
+}
