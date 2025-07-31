@@ -71,6 +71,20 @@ jobs:
           terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/ssm/terraform.tfstate"
           terraform destroy -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
+      - name: Init & get bucket name
+        run: |
+          cd infra/s3
+          terraform init -backend-config="bucket=${TF_BUCKET}" \
+                   -backend-config="key=${{ github.event.inputs.ENV }}/s3/terraform.tfstate"
+          BUCKET_NAME=$(terraform output -raw s3_bucket_name)
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+
+      - name: Empty S3 bucket
+        run: |
+          echo "Deleting objects from bucket: $BUCKET_NAME"
+          aws s3 rm s3://$BUCKET_NAME --recursive
+
+
       - name: Destroy S3
         run: |
           cd infra/s3
