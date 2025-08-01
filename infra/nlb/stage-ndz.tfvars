@@ -7,7 +7,7 @@ internal           = true
 target_port        = 4000
 lb_create_sg       = true
 additional_ports = [4000, 4001, 4002]
-
+key_path = "stage-ndz/vpc/terraform.tfstate"
 lb_egress_roles = [
   {
     description      = "Allow all outbound"
