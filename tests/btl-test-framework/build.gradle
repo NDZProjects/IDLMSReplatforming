@@ -3,11 +3,16 @@ import java.text.SimpleDateFormat
 
 plugins {
     id 'java'
+    id 'application'
     id 'io.qameta.allure' version '2.11.2' // Allure plugin
 }
 
-group 'com.btl.test'
-version '1.0-SNAPSHOT'
+application {
+    mainClass = 'com.btl.test.documentation.Main'
+}
+
+group='com.btl.test'
+version='1.0-SNAPSHOT'
 sourceSets {
     test {
         java {
@@ -95,7 +100,7 @@ test {
 
     testLogging {
         events "started", "passed", "failed", "skipped"  // include "started" to see when each test begins
-        exceptionFormat "full"
+        exceptionFormat="full"
         showStandardStreams = true
     }
 
@@ -146,6 +151,7 @@ tasks.register('json2md', JavaExec) {
 }
 
 tasks.register('md2json', JavaExec) {
+
     group = 'documentation'
     description = 'Converts Markdown documentation to JSON test cases'
 
@@ -166,5 +172,39 @@ tasks.register('md2json', JavaExec) {
     } else {
         args 'src/test/resources/flows/json'  // default output directory
     }
+
+    def outStream = new ByteArrayOutputStream()
+    def errStream = new ByteArrayOutputStream()
+
+    // 🚫 Don't capture output — let it print live
+    // This is default behavior, but being explicit helps
+    doFirst {
+        println "[INFO] Running md2json with args: $args"
+        standardOutput = System.out
+        errorOutput = System.err
+    }
 }
 
+tasks.register('fatJar', Jar) {
+    group = 'build'
+    description = 'Assembles a runnable JAR with all dependencies.'
+
+    archiveClassifier = 'all'  // Will produce something like btl-test-framework-all.jar
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+                'Main-Class': application.mainClass.get()
+        )
+    }
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}

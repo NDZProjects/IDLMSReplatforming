@@ -4,6 +4,8 @@ import com.btl.test.model.TestCase;
 import com.btl.test.model.TestCaseMetadata;
 import com.btl.test.model.TestStep;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -18,7 +20,8 @@ public class DocumentationParser {
     private static final Pattern METADATA_PATTERN = Pattern.compile("\\*\\*(\\w+):\\*\\*\\s*(.+)");
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public TestCase parseMarkdown(String markdown) {
+    public TestCase parseMarkdown(String markdown) throws IOException{
+        //System.out.println("Parsing: " + markdown);
         TestCase testCase = new TestCase();
         TestCaseMetadata metadata = new TestCaseMetadata();
         List<TestStep> steps = new ArrayList<>();
@@ -87,7 +90,7 @@ public class DocumentationParser {
         }
     }
 
-    private void parseSteps(String section, List<TestStep> steps) {
+    private void parseSteps(String section, List<TestStep> steps) throws IOException{
         String[] lines = section.split("\n");
         int headerLineIndex = -1;
 
@@ -133,12 +136,14 @@ public class DocumentationParser {
                     }
                     case "request body" -> {
                         if (!value.equals("-")) {
-                            step.setBody(parseMap(value));
+                            //System.out.println("Request Body: " + value);
+                            //System.out.println(parseJsonLikeString(value));
+                            step.setBody(parseJsonLikeString(value));
                         }
                     }
                     case "assertions" -> {
                         if (!value.equals("-")) {
-                            step.setAssertions(parseMap(value));
+                            step.setAssertions(parseJsonLikeString(value));
                         }
                     }
                     case "extract" -> {
@@ -254,6 +259,7 @@ public class DocumentationParser {
     }
 
     private TestStep parseStepRow(String line, List<String> headers) {
+        //System.out.println("Parsing step row: " + line);
         List<String> values = parseTableRow(line);
         if (values.size() < headers.size()) return null;
 
@@ -271,9 +277,11 @@ public class DocumentationParser {
 
         // Parse Request Body
         String bodyStr = columnMap.get("request body");
+       // System.out.println("bodyStr: " + bodyStr);
         if (bodyStr != null && !bodyStr.equals("-")) {
             try {
                 step.setBody(parseJsonLikeString(bodyStr));
+               // System.out.println("JSON: " + step.getBody());
             } catch (Exception e) {
                 System.err.println("Error parsing request body: " + bodyStr);
             }
@@ -321,22 +329,25 @@ public class DocumentationParser {
         return step;
     }
 
-    private Map<String, Object> parseJsonLikeString(String input) {
-        // Convert the string to proper JSON format
-        String jsonStr = input.replace("=", ":")
-                .replace("{", "{\"")
-                .replace("}", "\"}")
-                .replace(",", "\",\"")
-                .replace(":", "\":\"")
-                .replace("\"{", "{")
-                .replace("}\"", "}")
-                .replace("[\"", "[")
-                .replace("\"]", "]");
+
+
+    private Map<String, Object> parseJsonLikeString(String input)  throws IOException
+    {
+        //System.out.println("Parsing JSON-like string: " + input);
+        if (input == null || input.trim().isEmpty() || input.equals("-")) {
+           System.out.println("Warning: Empty JSON string in input: " + input);
+            return new HashMap<>();
+        }
 
         try {
-            return objectMapper.readValue(jsonStr, Map.class);
+            JsonNode jsonNode = objectMapper.readTree(input);
+            //System.out.println("JSON: " + jsonNode.toPrettyString());
+            return objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
-            throw new RuntimeException("Failed to parse JSON-like string: " + input, e);
+            System.err.println("Warning: Invalid JSON format in input: " + input);
+           // return new HashMap<>();
+            throw new IOException("Failed to parse JSON: " + e.getMessage(), e);
+
         }
     }
 

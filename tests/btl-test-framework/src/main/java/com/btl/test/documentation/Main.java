@@ -79,10 +79,11 @@ public class Main {
                         if (sourceExt.equals("json")) {
                             convertJsonToMarkdown(sourcePath, targetPath);
                         } else {
+                            //System.out.println("Converting: " + sourcePath.getFileName());
                             convertMarkdownToJson(sourcePath, targetPath);
                         }
 
-                        System.out.println("Processed: " + sourcePath.getFileName());
+                        //System.out.println("Processed: " + sourcePath.getFileName());
                     } catch (IOException e) {
                         System.err.println("Error processing file " + sourcePath + ": " + e.getMessage());
                     }
