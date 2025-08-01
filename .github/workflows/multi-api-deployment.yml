@@ -54,14 +54,14 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/vpc
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/vpc/terraform.tfstate"
+          terraform init -backend-config="${{ github.event.inputs.ENV }}-backend.hcl"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply NLB
         if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified), 'infra/')
         run: |
           cd infra/nlb
-          terraform init -backend-config="bucket=${TF_BUCKET}" -backend-config="key=${{ github.event.inputs.ENV }}/nlb/terraform.tfstate"
+          terraform init -backend-config="${{ github.event.inputs.ENV }}-backend.hcl"
           terraform apply -auto-approve -var-file="${{ github.event.inputs.ENV }}.tfvars"
 
       - name: Terraform Apply API Gateway
