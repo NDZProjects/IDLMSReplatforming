@@ -1,0 +1,629 @@
+{
+  "metadata": {
+    "epic": "Driving School Onboarding",
+    "feature": "Onboarding",
+    "severity": "Critical",
+    "tags": [
+      "Account",
+      "create",
+      "driving school",
+      "login",
+      "onboarding",
+      "inspection"
+    ],
+    "expectedResults": [
+      "School should successfully receive OTP via email",
+      "System should successfully validate the OTP",
+      "Driving school account should be created successfully",
+      "Driving school admin should login into the account successfully",
+      "System should successfully verifies license number",
+      "System should successfully upload the provided file",
+      "Driving school accreditattion payment should be successfully made",
+      "Driving school accreditattion payment should be successfully verified",
+      "Driving school accreditattion payment should be successfully updated",
+      "Driving school payment is scussfully confirmed",
+      "Driving admin admin successfully completes the onboarding process",
+      "A table containing all applications should be displayed",
+      "Admin should be able to view a pending application profile",
+      "Admin should be able to successfully view list of LASDRI officers",
+      "Admin should successfully query driving school applications",
+      "Driving admin successfully resubmits the queried application",
+      "A LASDRI officer should be successfully assigned to the school",
+      "LASDRI officer's fingerprint verification should be successful",
+      "Assigned inspections should be displayed successfully",
+      "Pending inspections should be displayed successfully",
+      "Selected school's profile should display successfully",
+      "Inspection questions should display successfully",
+      "Inspection should be successfully submitted"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Send OTP",
+      "name": "Send OTP to school email",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "${drivingSchoolEmail}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "School should successfully receive OTP via email"
+      ]
+    },
+    {
+      "story": "Validate email",
+      "name": "Validate OTP sent to the school email",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "${drivingSchoolEmail}",
+        "otp": "123456"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "System should successfully validate the OTP"
+      ]
+    },
+    {
+      "story": "Create account",
+      "name": "Driving school account creation",
+      "method": "POST",
+      "path": "driving-school/self-service/create",
+      "assertions": {
+        "status": 201
+      },
+      "body": {
+        "name": "Test Driving School ${randomString:8}",
+        "email": "${drivingSchoolEmail}",
+        "lgaId": 504,
+        "password": "Password@1234",
+        "phone": "${drivingSchoolPhone}",
+        "rcNumber": "RC-19342284",
+        "stateId": 25,
+        "address": "46 Agbado Ijaye, Ikeja, Lagos"
+      },
+      "extract": {
+        "driving_school_id": "data.id"
+      },
+      "expectedResults": [
+        "Driving school account should be created successfully"
+      ]
+    },
+    {
+      "story": "Login",
+      "name": "School admin login",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "${drivingSchoolEmail}",
+        "password": "Password@1234"
+      },
+      "extract": {
+        "driving_school_token": "accessToken"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school admin should login into the account successfully"
+      ]
+    },
+    {
+      "story": "Verify License number",
+      "name": "Proprietor and instructors' license number validation",
+      "method": "POST",
+      "path": "license/details-by-license-no",
+      "body": {
+        "licenseNo": "08739251"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "System should successfully verifies license number"
+      ]
+    },
+    {
+      "story": "Upload file",
+      "name": "Upload instructor and CAC file of the driving school",
+      "method": "POST",
+      "path": "files",
+      "body": {
+        "base64Image": "${base64Image}",
+        "documentType": "cac",
+        "fileName": "Certificate_2025-07-30T12:33:38.340Z",
+        "mimeType": "image/jpeg"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "System should successfully upload the provided file"
+      ]
+    },
+    {
+      "story": "Make payment",
+      "name": "School makes application payment",
+      "method": "POST",
+      "path": "payments/initiate",
+      "body": {
+        "type": "driving_school_accreditation_payment",
+        "email": "${drivingSchoolEmail}",
+        "description": "Driving School Accreditation Payment",
+        "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
+        "failureRedirectUrl": "http://localhost:4200/staging/payment-failed?"
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school accreditattion payment should be successfully made"
+      ]
+    },
+    {
+      "story": "Payment verification",
+      "name": "System verifies payment",
+      "method": "POST",
+      "path": "payments/verify",
+      "requires": [
+        "paymentReference"
+      ],
+      "body": {
+        "type": "driving_school_accreditation_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school accreditattion payment should be successfully verified"
+      ]
+    },
+    {
+      "story": "Payment update",
+      "name": "system updates payment",
+      "method": "POST",
+      "path": "payments/update",
+      "requires": [
+        "paymentReference"
+      ],
+      "body": {
+        "type": "driving_school_accreditation_payment",
+        "reference": "${paymentReference}",
+        "status": "pending",
+        "used": 0
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school accreditattion payment should be successfully updated"
+      ]
+    },
+    {
+      "story": "Payment confirmation",
+      "name": "system confirms payment",
+      "method": "POST",
+      "path": "driving-school/confirm-application-payment/${paymentReference}",
+      "requires": [
+        "paymentReference",
+        "driving_school_token"
+      ],
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school payment is scussfully confirmed"
+      ]
+    },
+    {
+      "story": "complete_onboarding",
+      "name": "School submits the application for school onboarding, awaiting inspection",
+      "method": "POST",
+      "path": "driving-school/complete-application",
+      "requires": [
+        "driving_school_token",
+        "driving_school_id"
+      ],
+      "body": {
+        "drivingSchoolId": "${driving_school_id|number}",
+        "totalVehicles": 2,
+        "specialGadgets": "",
+        "totalSimulators": 4,
+        "teachingAids": "Instructor guide",
+        "trainingRange": "1",
+        "totalClassrooms": 4,
+        "classRoomCapacity": "8",
+        "totalInstructors": 1,
+        "docType": "cac",
+        "docFile": "cac_2025-07-14T11:54:35.102Z",
+        "vehicles": [
+          {
+            "isBranded": true,
+            "isFunctional": true,
+            "vehicleType": "sedan",
+            "vehicleMake": "toyota",
+            "specialGadgets": "Fire estinguisher",
+            "registrationNumber": "${registrationNumber1}"
+          },
+          {
+            "isBranded": true,
+            "isFunctional": true,
+            "vehicleType": "suv",
+            "vehicleMake": "mercedes-benz",
+            "specialGadgets": "Fire estinguisher",
+            "registrationNumber": "${registrationNumber2}"
+          }
+        ],
+        "instructors": [
+          {
+            "instructorId": "IN-${randomString:6}",
+            "name": "Ademola null Abidoye",
+            "phone": "08120809261",
+            "email": "johndoe.${randomString:8}@example.com",
+            "genderId": 1,
+            "lgaId": 494,
+            "stateId": 24,
+            "address": "Lape Estate, Karu, Abuja",
+            "qualification": "masters",
+            "isTrained": true,
+            "isActive": 1,
+            "certificateFile": 1851,
+            "dateOfBirth": "20-01-1985",
+            "licenseClassId": 3
+          }
+        ],
+        "proprietorLicenseNo": "57148329",
+        "proprietor": {
+          "name": "Ademola  Abidoye",
+          "phone": "08120809261",
+          "email": "abidoyedemola+${randomString:8}@gmail.com",
+          "dateOfBirth": "20-01-1985",
+          "genderId": 1,
+          "lgaId": 494,
+          "stateId": 24,
+          "address": "Lape Estate, Karu, Abuja",
+          "licenseNo": "57148329",
+          "avatar": ""
+        }
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving admin admin successfully completes the onboarding process"
+      ]
+    },
+    {
+      "story": "Application module",
+      "name": "Admin acesses the list of new driving school applications",
+      "method": "GET",
+      "path": "driving-school/list",
+      "assertions": {
+        "status": 200
+      },
+      "requires": [
+        "lasdri_admin_token"
+      ],
+      "expectedResults": [
+        "A table containing all applications should be displayed"
+      ],
+      "query": {
+        "page": "1",
+        "resultPerPage": "10",
+        "isApprovedOnly": false
+      }
+    },
+    {
+      "story": "Pending application",
+      "name": "Admin views a pending driving school application",
+      "method": "GET",
+      "path": "driving-school/single/${driving_school_id}",
+      "requires": [
+        "lasdri_admin_token",
+        "driving_school_id"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Admin should be able to view a pending application profile"
+      ]
+    },
+    {
+      "story": "Inspectors list",
+      "name": "Admin accesses the list of inspectors",
+      "method": "GET",
+      "path": "driving-school/list-lasdri-officers",
+      "assertions": {
+        "status": 200
+      },
+      "requires": [
+        "lasdri_admin_token"
+      ],
+      "expectedResults": [
+        "Admin should be able to successfully view list of LASDRI officers"
+      ],
+      "query": {
+        "page": "1",
+        "resultPerPage": "10"
+      }
+    },
+    {
+      "story": "Query application",
+      "name": "Admin queries an application and gives reason(s)",
+      "method": "POST",
+      "path": "driving-school/query-application/${driving_school_id}",
+      "requires": [
+        "lasdri_admin_token",
+        "driving_school_id"
+      ],
+      "body": {
+        "applicationId": "${driving_school_id}",
+        "reason": "Test Reason"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Admin should successfully query driving school applications"
+      ]
+    },
+    {
+      "story": "Resubmit application",
+      "name": "School resubmits the application for school onboarding, awaiting inspection",
+      "method": "POST",
+      "path": "driving-school/complete-application",
+      "requires": [
+        "driving_school_token",
+        "driving_school_id"
+      ],
+      "body": {
+        "drivingSchoolId": "${driving_school_id|number}",
+        "totalVehicles": 2,
+        "specialGadgets": "",
+        "totalSimulators": 4,
+        "teachingAids": "Instructor guide",
+        "trainingRange": "1",
+        "totalClassrooms": 4,
+        "classRoomCapacity": "8",
+        "totalInstructors": 1,
+        "docType": "cac",
+        "docFile": "cac_2025-07-14T11:54:35.102Z",
+        "vehicles": [
+          {
+            "isBranded": true,
+            "isFunctional": true,
+            "vehicleType": "sedan",
+            "vehicleMake": "toyota",
+            "specialGadgets": "Fire estinguisher",
+            "registrationNumber": "${registrationNumber1}"
+          },
+          {
+            "isBranded": true,
+            "isFunctional": true,
+            "vehicleType": "suv",
+            "vehicleMake": "mercedes-benz",
+            "specialGadgets": "Fire estinguisher",
+            "registrationNumber": "${registrationNumber2}"
+          }
+        ],
+        "instructors": [
+          {
+            "instructorId": "IN-${randomString:6}",
+            "name": "Ademola null Abidoye",
+            "phone": "08120809261",
+            "email": "johndoe.${randomString:8}@example.com",
+            "genderId": 1,
+            "lgaId": 494,
+            "stateId": 24,
+            "address": "Lape Estate, Karu, Abuja",
+            "qualification": "masters",
+            "isTrained": true,
+            "isActive": 1,
+            "certificateFile": 1851,
+            "dateOfBirth": "20-01-1985",
+            "licenseClassId": 3
+          }
+        ],
+        "proprietorLicenseNo": "57148329",
+        "proprietor": {
+          "name": "Ademola  Abidoye",
+          "phone": "08120809261",
+          "email": "abidoyedemola+${randomString:8}@gmail.com",
+          "dateOfBirth": "20-01-1985",
+          "genderId": 1,
+          "lgaId": 494,
+          "stateId": 24,
+          "address": "Lape Estate, Karu, Abuja",
+          "licenseNo": "57148329",
+          "avatar": ""
+        }
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving admin successfully resubmits the queried application"
+      ]
+    },
+    {
+      "story": "Assign inspector",
+      "name": "Admin assings an inspector to the driving school",
+      "method": "POST",
+      "path": "driving-school/lasdri/assign-officer",
+      "requires": [
+        "lasdri_admin_token",
+        "driving_school_id",
+        "lasdri_officer_id"
+      ],
+      "body": {
+        "drivingSchoolId": "${driving_school_id|number}",
+        "inspectionDate": "2025-07-28T11:34:02.983Z",
+        "officerId": "${lasdri_officer_id|number}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "A LASDRI officer should be successfully assigned to the school"
+      ]
+    },
+    {
+      "story": "Capture biometric",
+      "name": "LASDRI officer does fingerprint for verification",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "assertions": {
+        "status": 201
+      },
+      "requires": [
+        "lasdri_officer_token"
+      ],
+      "body": {
+        "email": "agyakoji+1@gmail.com",
+        "files": [
+          {
+            "documenType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      },
+      "expectedResults": [
+        "LASDRI officer's fingerprint verification should be successful"
+      ]
+    },
+    {
+      "story": "Assigned Inspections",
+      "name": "LASDRI officer views the assigned inspections",
+      "method": "GET",
+      "path": "inspections/assigned",
+      "requires": [
+        "lasdri_officer_token"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Assigned inspections should be displayed successfully"
+      ]
+    },
+    {
+      "story": "Pending Inspections",
+      "name": "Lists all pending inspections for the agent",
+      "requires": [
+        "lasdri_officer_token"
+      ],
+      "method": "GET",
+      "path": "inspections/assigned",
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Pending inspections should be displayed successfully"
+      ]
+    },
+    {
+      "story": "Driving School Details",
+      "name": "Displays the details of the selected driving school",
+      "method": "GET",
+      "path": "driving-school/applications/details/${driving_school_id}",
+      "requires": [
+        "lasdri_officer_token",
+        "driving_school_id"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Selected school's profile should display successfully"
+      ]
+    },
+    {
+      "story": "Get Inspection Questions",
+      "name": "Gets the inspection questions",
+      "method": "GET",
+      "path": "inspections/get-questions/25",
+      "requires": [
+        "lasdri_officer_token"
+      ],
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Inspection questions should display successfully"
+      ]
+    },
+    {
+      "story": "Submit Inspection",
+      "name": "Submits the inspection tests",
+      "method": "POST",
+      "path": "inspections/submit-inspection",
+      "requires": [
+        "lasdri_officer_token",
+        "driving_school_id"
+      ],
+      "body": {
+        "drivingSchoolId": "${driving_school_id|number}",
+        "questionId": 1,
+        "status": 1,
+        "totalScore": "LASDRI Inspection for the month of May 2025",
+        "stateId": 25,
+        "inspectionResult": [
+          {
+            "questionId": 1,
+            "choice": "A. Yes",
+            "comment": "good"
+          },
+          {
+            "questionId": 2,
+            "choice": "A. Yes",
+            "comment": "good"
+          },
+          {
+            "questionId": 3,
+            "choice": "A. Yes",
+            "comment": "good"
+          },
+          {
+            "questionId": 4,
+            "choice": "A. Yes",
+            "comment": "good"
+          },
+          {
+            "questionId": 5,
+            "choice": "A. Yes",
+            "comment": "good"
+          },
+          {
+            "questionId": 6,
+            "choice": "A. Yes",
+            "comment": "good"
+          },
+          {
+            "questionId": 7,
+            "choice": "A. Yes",
+            "comment": "good"
+          }
+        ],
+        "month": 5,
+        "year": 2025
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Inspection should be successfully submitted"
+      ]
+    }
+  ]
+}
