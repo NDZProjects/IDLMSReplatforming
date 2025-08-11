@@ -1,2 +1,2 @@
-environment = "btl-dev"
-enable_versioning = true
+# environment = "btl-dev"
+# enable_versioning = true

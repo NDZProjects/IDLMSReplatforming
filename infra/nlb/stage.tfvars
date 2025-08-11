@@ -1,7 +1,7 @@
 tf_state_bucket = "stage-btl-idlms-backend-api-tfstate"
 environment     = "stage"
-region          = "eu-west-1"
-tf_state_region  = "eu-west-1"
+region          = "ap-southeast-1"
+tf_state_region  = "ap-southeast-1"
 load_balancer_type = "network"
 internal           = true
 target_port        = 4000

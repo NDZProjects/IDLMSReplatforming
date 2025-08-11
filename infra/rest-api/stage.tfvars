@@ -1,4 +1,4 @@
-region               = "eu-west-1"
+region               = "ap-southeast-1"
 environment          = "stage"
 stage_name           = "stage-idlms"
 log_retention_days   = 7
@@ -18,4 +18,4 @@ data_trace_enabled   = false
 
 api_port = 4000
 tf_state_bucket  = "stage-btl-idlms-backend-api-tfstate"
-tf_state_region  = "eu-west-1"
+tf_state_region  = "ap-southeast-1"
