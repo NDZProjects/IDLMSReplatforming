@@ -78,6 +78,7 @@
       "method": "POST",
       "path": "driving-test/submit-driving-test",
       "body": {
+        "certificateNo": "${certificateNo}",
         "applicationNo": "DRLP/2025/189704",
         "score": 91,
         "answers": [
