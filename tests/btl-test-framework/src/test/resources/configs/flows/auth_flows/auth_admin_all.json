@@ -64,7 +64,9 @@
         "status": 400,
         "body": {
           "message": {
-            "contains": "email must be an email"
+            "details[0]": "email must be an email",
+            "contains": "Bad Request Exception"
+
           }
         }
       }
