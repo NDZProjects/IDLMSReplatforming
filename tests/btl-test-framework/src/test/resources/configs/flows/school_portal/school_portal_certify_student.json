@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "epic": "Certification of Students",
+    "feature": "Certifying students who successfully finished driving training",
+    "severity": "Critical",
+    "tags": [
+      "Certify",
+      "students"
+    ],
+    "expectedResults": [
+      "Driving school admin should successfully view the student's profile",
+      "Driving school admin should successfully certify the student"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Students profile",
+      "name": "Admin opens/view students' profile",
+      "method": "POST",
+      "path": "driving-school/students/details/${studentNo}",
+      "requires": [
+        "school_admin_token",
+        "studentNo"
+      ],
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school admin should successfully view the student's profile"
+      ]
+    },
+    {
+      "story": "Cerification",
+      "name": "Admin certifies the student",
+      "method": "POST",
+      "path": "driving-school/students/issue-cert",
+      "requires": [
+        "school_admin_token",
+        "studentNo"
+      ],
+      "body": {
+        "studentNo": "${studentNo}",
+        "modules": [
+          "Eco-Driving & Fuel Efficiency",
+          "Test 3",
+          "Test 2",
+          "Final Assessment",
+          "Introduction to Road Safety",
+          "Traffic Rules & Regulations",
+          "Understanding Road Signs",
+          "Vehicle Controls & Operation",
+          "Basic Driving Techniques",
+          "Defensive Driving",
+          "Night & Adverse Weather Driving",
+          "Highway/Motorway Driving",
+          "Parking & Manoeuvring Skills",
+          "Emergency Handling & Safety",
+          "Vehicle Maintenance Basics",
+          "Mock Theory Tests",
+          "Test 1",
+          "Precautions",
+          "Adverse Weather Driving"
+        ]
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school admin should successfully certify the student"
+      ]
+    }
+  ]
+}

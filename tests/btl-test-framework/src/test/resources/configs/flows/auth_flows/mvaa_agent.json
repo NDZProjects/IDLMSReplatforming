@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "epic": "Authentication",
+    "feature": "MVAA Agent",
+    "severity": "critical",
+    "tags": [
+      "authentication",
+      "mvaa_agent",
+      "login"
+    ],
+    "expectedResults": [
+      "Mvaa agent login returns status 201 with a valid access token."
+    ]
+  },
+  "steps": [
+    {
+      "story": "Authenticate as mvaa agent",
+      "name": "mvaa_agent: Authenticate as mvaa agent",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "mvaaagent@mailinator.com",
+        "password": "password"
+      },
+      "extract": {
+        "mvaa_agent_token": "accessToken"
+      },
+      "assertions": {
+        "status": 201,
+        "body": {
+          "accessToken": {
+            "exists": true
+          },
+          "success": true
+        }
+      }
+    }
+  ]
+}
