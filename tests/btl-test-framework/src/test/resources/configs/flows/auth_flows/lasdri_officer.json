@@ -19,7 +19,7 @@
       "path": "auth/login",
       "body": {
         "email": "agyakoji+1@gmail.com",
-        "password": "kaa5adr2"
+        "password": "Kaa#5adr3"
       },
       "extract": {
         "lasdri_officer_token": "accessToken",

@@ -13,7 +13,7 @@
       "story": "Verify NIN for student registration",
       "name": "Driving school Register Student: Verify NIN",
       "method": "GET",
-      "path": "auth/verify-nin/22345678938",
+      "path": "auth/verify-nin/94089085948",
       "requires": ["school_admin_token"],
       "assertions": {
         "status": 200,

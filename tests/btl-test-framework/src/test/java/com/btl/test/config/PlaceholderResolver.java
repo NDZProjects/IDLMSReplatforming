@@ -152,6 +152,15 @@ public class PlaceholderResolver {
             }
             return generateNumericString(length);
         }
+        if ("randomStringUpperCase".equals(key)) {
+            int length = 8; // default length
+            if (param != null) {
+                try {
+                    length = Integer.parseInt(param);
+                } catch (NumberFormatException ignored) {}
+            }
+            return generateRandomString(length).toUpperCase();
+        }
 
         // Fallback: try to return from context
         return context.getOrDefault(key, null);
