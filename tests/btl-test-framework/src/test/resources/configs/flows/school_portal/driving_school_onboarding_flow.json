@@ -83,7 +83,7 @@
         "lgaId": 504,
         "password": "Password@1234",
         "phone": "${drivingSchoolPhone}",
-        "rcNumber": "RC-19342284",
+        "rcNumber": "RC-${numericString:8}",
         "stateId": 25,
         "address": "46 Agbado Ijaye, Ikeja, Lagos"
       },
@@ -152,7 +152,7 @@
       "method": "POST",
       "path": "payments/initiate",
       "body": {
-        "type": "driving_school_accreditation_payment",
+        "type": "driving_school_application_payment",
         "email": "${drivingSchoolEmail}",
         "description": "Driving School Accreditation Payment",
         "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
@@ -177,7 +177,7 @@
         "paymentReference"
       ],
       "body": {
-        "type": "driving_school_accreditation_payment",
+        "type": "driving_school_application_payment",
         "reference": "${paymentReference}"
       },
       "assertions": {
@@ -196,7 +196,7 @@
         "paymentReference"
       ],
       "body": {
-        "type": "driving_school_accreditation_payment",
+        "type": "driving_school_application_payment",
         "reference": "${paymentReference}",
         "status": "pending",
         "used": 0
