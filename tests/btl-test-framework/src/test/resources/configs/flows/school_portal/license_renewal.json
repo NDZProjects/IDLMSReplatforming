@@ -1,0 +1,402 @@
+{
+  "metadata": {
+    "epic": "Driver's License Renewal",
+    "feature": "License Renewal",
+    "severity": "Critical",
+    "tags": [
+      "License Renewal",
+      "Driving Test",
+      "Biometrics verification",
+      "Generate licence"
+    ],
+    "expectedResults": [
+      "Applicant should successfully login into his account",
+      "Applicant should successfully initiate payment",
+      "System should successfully verify payment",
+      "System should successfully validate payment",
+      "Applicant should successfully access the Driving Test schedule page",
+      "Applicant should successfully get list of driving test centres",
+      "Applicant should successfully get a driving test slot",
+      "Applicant should successfully book a driving test slot",
+      "Applicant should successfully schedule a driving test",
+      "DVIS Officer should successfully login",
+      "DVIS officer's fingerprint verification should be successful",
+      "Applicant should successfully receive OTP",
+      "OTP should be successfully validated",
+      "Applicant's certificate number should be successfully validated",
+      "Applicant's face should  be successful",
+      "LASDRI officer should successfully submit the driving test",
+      "Applicant should successfully access the Driving Test schedule page",
+      "Applicant should successfully get list of biometric centres",
+      "Applicant should successfully get slot for biometric capture",
+      "Applicant should successfully schedule slot for biometric capture",
+      "MVAA Officer should successfully login",
+      "MVAA officer's fingerprint verification should be successful",
+      "Applicant should successfully receive OTP",
+      "OTP should be successfully validated",
+      "Applicant's license number should be successfully validated",
+      "Applicant face validation should be successful",
+      "Applicant's bio data should display successfully",
+      "Applicant's biometrics capture should be successfully submitted",
+      "License should be successfully generated"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Login",
+      "name": "Applicant logins to their account",
+      "method": "POST",
+      "path": "auth/self-service/login",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "password": "Password@1234"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "applicant_token": "data.accessToken"
+      },
+      "expectedResults": [
+        "Applicant should successfully login into his account"
+      ]
+    },
+    {
+      "story": "Initiate payment",
+      "name": "Initialize payment with auto detect feature",
+      "method": "POST",
+      "path": "payments/initiate",
+      "requires": [
+        "applicant_token",
+        "paymentReference"
+      ],
+      "body": {
+        "type": "new_license_payment",
+        "drivingSchoolId": "14",
+        "password": "Password@1234",
+        "email": "${studentEmailDrivingSchool}",
+        "currency": "NGN",
+        "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
+        "failureRedirectUrl": "http://localhost:4200/staging/payment-failed?",
+        "description": "new_license_payment"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "expectedResults": []
+    },
+    {
+      "story": "verify payment",
+      "name": "verify payment after client has been redirected. This sets the payment to completed if successfully verified.",
+      "method": "POST",
+      "path": "payments/verify",
+      "requires": [
+        "applicant_token",
+        "paymentReference"
+      ],
+      "body": {
+        "type": "new_license_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "validate payment",
+      "path": "payments/validate-transaction",
+      "method": "POST",
+      "name": "Validate the status of a transaction",
+      "body": {
+        "type": "new_license_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 404
+      }
+    },
+    {
+      "story": "Driving Test Schedule page",
+      "name": "Applicant accesses the Driving Test schedule page",
+      "method": "GET",
+      "path": "notifications/unread-count",
+      "requires": [
+        "applicant_token"
+      ],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Capture biometric",
+      "name": "DVIS officer does fingerprint for verification",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "body": {
+        "email": "agyakoji+30@gmail.com",
+        "files": [
+          {
+            "documenType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      }
+    },
+    {
+      "story": "Contact validation",
+      "name": "Send OTP to supplied email or phone",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "phone": "${drivingSchoolPhone}"
+      }
+    },
+    {
+      "story": "Receive OTP",
+      "name": "Validate OTP sent to supplied email or phone",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "phone": "${drivingSchoolPhone}",
+        "otp": "123456"
+      }
+    },
+    {
+      "story": "Certificate validation",
+      "name": "Validate the certificate number",
+      "method": "POST",
+      "path": "driving-school/validate-cert-no",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "body": {
+        "certificateNo": "${certificateNo}"
+      }
+    },
+    {
+      "story": "Face match",
+      "name": "Verify applicant NIN via face capture/face mat",
+      "method": "GET",
+      "path": "auth/verify-nin/94148931536",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "assertions": {},
+      "expectedResults": [
+        "Applicant's face should  be successful"
+      ]
+    },
+    {
+      "story": "submit test",
+      "name": "Submit driving test",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "body": {
+        "answers": [
+          "string"
+        ],
+        "licenseClassId": 1,
+        "certificateNo": "${certificateNo}",
+        "score": 0,
+        "files": [
+          "string"
+        ],
+        "vehicleType": "string",
+        "location": "string",
+        "reference": "string",
+        "transactionId": 0,
+        "drivingTestCenterId": "${drivingTestCenterID|number}"
+      }
+    },
+    {
+      "story": "Biometric Schedule page",
+      "name": "Applicant accesses the biometrics schedule page",
+      "method": "GET",
+      "path": "notifications/unread-count",
+      "requires": [
+        "applicant_token"
+      ]
+    },
+    {
+      "story": "Biometrics Centres",
+      "name": "Get list of driving test centres",
+      "method": "GET",
+      "path": "biometrics/centers",
+      "assertions": {},
+      "requires": [
+        "applicant_token"
+      ],
+      "expectedResults": [
+        "Applicant should successfully get list of biometric centres"
+      ]
+    },
+    {
+      "story": "Biometrics slots",
+      "name": "Get biometrics slot",
+      "method": "POST",
+      "path": "biometrics/slots",
+      "body": {
+        "centerId": 1
+      },
+      "extract": {
+        "availableSlotDate": "data.availableSlots[0].date",
+        "availableSlotTime": "data.availableSlots[0].times[0]"
+      }
+    },
+    {
+      "story": "Schedule biometrics",
+      "name": "Schedule biometrics capture for applicant",
+      "method": "POST",
+      "path": "biometrics/schedule-applicant-biometrics",
+      "body": {
+        "licenseRequestId": 1,
+        "centerId": 1,
+        "stateId": 25,
+        "lgaId": 518,
+        "date": "${availableSlotDate}",
+        "time": "${availableSlotTime}"
+      }
+    },
+    {
+      "story": "MVAA officer login",
+      "name": "MVAA officer logs into mobile app account",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "agyakoji+500@gmail.com",
+        "password": "Password@1234"
+      },
+      "extract": {
+        "mvaa_officer_token": "accessToken"
+      },
+      "assertions": {},
+      "expectedResults": [
+        "MVAA Officer should successfully login"
+      ]
+    },
+    {
+      "story": "Capture MVAA officer's biometric",
+      "name": "MVAA officer does fingerprint for verification",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "requires": [
+        "mvaa_officer_token"
+      ],
+      "body": {
+        "email": "agyakoji+50@gmail.com",
+        "files": [
+          {
+            "documenType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      }
+    },
+    {
+      "story": "Contact validation",
+      "name": "Send OTP to supplied email or phone",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "phone": "${drivingSchoolPhone}"
+      }
+    },
+    {
+      "story": "Receive OTP",
+      "name": "Validate OTP sent to supplied email or phone",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "phone": "${drivingSchoolPhone}",
+        "otp": "123456"
+      }
+    },
+    {
+      "story": "License number validation",
+      "name": "Validate Applicant's license number",
+      "method": "POST",
+      "path": "license/verify",
+      "requires": [
+        "licenseNo",
+        "certificateNo"
+      ],
+      "body": {
+        "licenseNo": "${licenseNo}",
+        "studentCertNo": "${certificateNo}"
+      }
+    },
+    {
+      "story": "Face validation",
+      "name": "Verify applicant NIN via face capture/face match",
+      "method": "GET",
+      "path": "auth/verify-nin/94148931536",
+      "assertions": {},
+      "expectedResults": [
+        "Applicant's face should  be successfully validated"
+      ]
+    },
+    {
+      "story": "Applicant's biodata",
+      "name": "Get license details by license number",
+      "method": "GET",
+      "path": "license/details-by-license-no",
+      "requires": [
+        "licenseNo",
+        "certificateNo"
+      ],
+      "body": {
+        "licenseNo": "${licenseNo}",
+        "studentCertNo": "${certificateNo}"
+      }
+    },
+    {
+      "story": "Submit license request",
+      "name": "Submit new license request",
+      "method": "POST",
+      "path": "biometrics/submit-biometric-results",
+      "requires": [
+        "mvaa_officer_token"
+      ],
+      "body": {
+        "licenseRequestId": 1,
+        "status": "passed",
+        "files": [
+          {
+            "fileId": 0,
+            "documentType": "string",
+            "fingerType": "string"
+          }
+        ],
+        "notes": "Biometric capture completed successfully"
+      }
+    },
+    {
+      "story": "Generate License",
+      "name": "Generate new license",
+      "method": "GET",
+      "path": "license/generate-license/${licenseNo}",
+      "requires": [
+        "licenseNo"
+      ],
+      "assertions": {},
+      "expectedResults": [
+        "License should be successfully generated"
+      ]
+    }
+  ]
+}

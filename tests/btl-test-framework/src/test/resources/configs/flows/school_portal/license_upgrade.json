@@ -1,0 +1,879 @@
+{
+  "metadata": {
+    "epic": "License Upgrade",
+    "feature": "Upgrade License flow",
+    "severity": "Critical",
+    "tags": [
+      "Upgrade License",
+      "license class",
+      "CBT",
+      "Driving Test",
+      "Generate license"
+    ],
+    "expectedResults": [
+      "Applicant should successfully login into his account",
+      "Applicant should successfully access the school enrolment page",
+      "Applicant should successfully made payment",
+      "System should successfully verify the payment",
+      "Applicant should successfully submit driving lesson application",
+      "Admin should successfully login to the portal",
+      "Table containing driving school applications should be displayed",
+      "Driving school admin should successfully view the student's application profile",
+      "Driving school admin should successfully acknowlegde the driving training application",
+      "The system should successfully generate leaner's permit",
+      "Driving school admin should successfully view the student's profile",
+      "Driving school admin should successfully certify the student",
+      "Applicant should successfully access the CBT schedule page",
+      "Applicant should successfully select CBT centre",
+      "Applicant should successfully select CBT slot",
+      "Applicant should successfully books CBT slot",
+      "Applicant should successfully schedule CBT",
+      "Applicant should successfully initiate payment",
+      "System should successfully verify payment",
+      "System should successfully validate payment",
+      "Applicant should successfully verify application number",
+      "Applicant should successfully verify nin and face match",
+      "Applicant should be able to access their questions",
+      "Applicants should be able to successfully submit CBT test",
+      "Applicant should successfully access the Driving Test schedule page",
+      "Applicant should successfully get list of driving test centres",
+      "Applicant should successfully get a driving test slot",
+      "Applicant should successfully book a driving test slot",
+      "Applicant should successfully schedule a driving test",
+      "DVIS Officer should successfully login",
+      "DVIS officer's fingerprint verification should be successful",
+      "Applicant should successfully receive OTP",
+      "OTP should be successfully validated",
+      "Applicant's certificate number should be successfully validated",
+      "Applicant's face should  be successful",
+      "DVIS officer should successfully submit the driving test",
+      "Applicant should successfully access the Driving Test schedule page",
+      "Applicant should successfully get list of biometric centres",
+      "Applicant should successfully get slot for biometric capture",
+      "Applicant should successfully schedule slot for biometric capture",
+      "MVAA Officer should successfully login",
+      "MVAA officer's fingerprint verification should be successful",
+      "System should successfully verifies license number",
+      "Applicant's bio data should display successfully",
+      "Applicant's face should  be successfully validated",
+      "License should be successfully generated"
+    ]
+  },
+  "steps": [
+    {
+      "story": "Login",
+      "name": "Applicant logins to their account",
+      "method": "POST",
+      "path": "auth/self-service/login",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "password": "Password@1234"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "applicant_token": "data.accessToken"
+      },
+      "expectedResults": [
+        "Applicant should successfully login into his account"
+      ]
+    },
+    {
+      "story": "Initiate payment",
+      "name": "Initialize payment with auto detect feature",
+      "method": "POST",
+      "path": "payments/initiate",
+      "requires": [
+        "applicant_token",
+        "paymentReference"
+      ],
+      "body": {
+        "type": "license_upgrade_payment",
+        "drivingSchoolId": "14",
+        "password": "Password@1234",
+        "email": "${studentEmailDrivingSchool}",
+        "currency": "NGN",
+        "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
+        "failureRedirectUrl": "http://localhost:4200/staging/payment-failed?",
+        "description": "license_upgrade_payment"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "expectedResults": []
+    },
+    {
+      "story": "verify payment",
+      "name": "verify payment after client has been redirected. This sets the payment to completed if successfully verified.",
+      "method": "POST",
+      "path": "payments/verify",
+      "requires": [
+        "applicant_token",
+        "paymentReference"
+      ],
+      "body": {
+        "type": "license_upgrade_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "validate payment",
+      "path": "payments/validate-transaction",
+      "method": "POST",
+      "name": "Validate the status of a transaction",
+      "body": {
+        "type": "license_upgrade_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 404
+      }
+    },
+    {
+      "story": "Submit license upgrade application",
+      "name": "Applicant submits license upgrade application",
+      "method": "POST",
+      "path": "driving-school/license-upgrade/submission",
+      "body": {
+        "stateId": 25,
+        "lgaId": 504,
+        "licenseClassId": 2,
+        "drivingSchoolId": 14,
+        "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
+        "failureRedirectUrl": "http://localhost:4200/staging/payment-failed?"
+      }
+    },
+    {
+      "story": "Login",
+      "name": "Driving school admin logs into their account.",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "agyakoji+409@gmail.com",
+        "password": "Password@1234"
+      },
+      "assertions": {},
+      "extract": {
+        "school_admin_token": "accessToken"
+      },
+      "expectedResults": [
+        "Admin should successfully login to the portal"
+      ]
+    },
+    {
+      "story": "Application module",
+      "name": "Admin accesses table/list of applications",
+      "method": "GET",
+      "path": "users/driving-school-application",
+      "assertions": {},
+      "requires": [
+        "school_admin_token"
+      ],
+      "expectedResults": [
+        "Table containing driving school applications should be displayed"
+      ]
+    },
+    {
+      "story": "Students application profile",
+      "name": "Admin opens/view applicant's profile",
+      "method": "GET",
+      "path": "driving-school/applicant/details/${applicationId}",
+      "assertions": {},
+      "requires": [
+        "school_admin_token",
+        "applicationID"
+      ],
+      "expectedResults": [
+        "Driving school admin should successfully view the student's application profile"
+      ]
+    },
+    {
+      "story": "Acknowledgement",
+      "name": "Admin acknowledges the application",
+      "method": "POST",
+      "path": "driving-school/change-application-status",
+      "body": {
+        "applicationId": "${applicationId}",
+        "status": 1
+      },
+      "extract": {
+        "studentNo": "data.studentNo"
+      }
+    },
+    {
+      "story": "Learner's permit",
+      "name": "Generate learner's permit",
+      "method": "POST",
+      "path": "driving-school/generate-permit",
+      "requires": [
+        "studentNo"
+      ],
+      "body": {
+        "studentNo": "${studentNo}"
+      }
+    },
+    {
+      "story": "Students profile",
+      "name": "Admin opens/view students' profile",
+      "method": "POST",
+      "path": "driving-school/students/details/${studentNo}",
+      "requires": [
+        "school_admin_token",
+        "studentNo"
+      ],
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Driving school admin should successfully view the student's profile"
+      ]
+    },
+    {
+      "story": "Cerification",
+      "name": "Admin certifies the student",
+      "method": "POST",
+      "path": "driving-school/students/issue-cert",
+      "requires": [
+        "school_admin_token",
+        "studentNo"
+      ],
+      "body": {
+        "studentNo": "${studentNo}",
+        "modules": [
+          "Eco-Driving & Fuel Efficiency",
+          "Test 3",
+          "Test 2",
+          "Final Assessment",
+          "Introduction to Road Safety",
+          "Traffic Rules & Regulations",
+          "Understanding Road Signs",
+          "Vehicle Controls & Operation",
+          "Basic Driving Techniques",
+          "Defensive Driving",
+          "Night & Adverse Weather Driving",
+          "Highway/Motorway Driving",
+          "Parking & Manoeuvring Skills",
+          "Emergency Handling & Safety",
+          "Vehicle Maintenance Basics",
+          "Mock Theory Tests",
+          "Test 1",
+          "Precautions",
+          "Adverse Weather Driving"
+        ]
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "certificateNo": "data.certificateNo"
+      },
+      "expectedResults": [
+        "Driving school admin should successfully certify the student"
+      ]
+    },
+    {
+      "story": "CBT Centre",
+      "name": "Applicant select CBT centre",
+      "method": "GET",
+      "path": "cbt/centers",
+      "requires": [
+        "applicant_token"
+      ],
+      "query": {
+        "stateId": 25,
+        "lgaId": 504
+      },
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Applicant should successfully select CBT centre"
+      ]
+    },
+    {
+      "story": "CBT slot",
+      "name": "Applicant selects CBT slot",
+      "method": "POST",
+      "requires": [
+        "applicant_token"
+      ],
+      "path": "cbt/slots",
+      "body": {
+        "cbtCenterId": 13
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "bookedSlotDate": "data.bookedSlots[0].date",
+        "bookedSlotTime": "data.bookedSlots[0].time"
+      },
+      "expectedResults": [
+        "Applicant should successfully select CBT slot"
+      ]
+    },
+    {
+      "story": "Book slot",
+      "name": "Applicant books CBT slot",
+      "method": "POST",
+      "path": "cbt/book-slot",
+      "requires": [
+        "applicant_token",
+        "bookedSlotDate",
+        "bookedSlotTime"
+      ],
+      "body": {
+        "cbtCenterId": 13,
+        "studentId": 0,
+        "stateId": 25,
+        "lgaId": 504,
+        "date": "${bookedSlotDate}",
+        "time": "${bookedSlotTime}"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "schedule CBT",
+      "name": "Applicant schedules CBT",
+      "method": "POST",
+      "path": "cbt/v4/schedule-cbt",
+      "requires": [
+        "applicant_token",
+        "bookedSlotDate",
+        "bookedSlotTime",
+        "paymentReference"
+      ],
+      "body": {
+        "reference": "${paymentReference}",
+        "cbtCenterId": 13,
+        "date": "${bookedSlotDate}",
+        "time": "${bookedSlotTime}"
+      },
+      "assertions": {
+        "status": 500
+      }
+    },
+    {
+      "story": "Initiate payment",
+      "name": "Initialize payment with auto detect feature",
+      "method": "POST",
+      "path": "payments/initiate",
+      "requires": [
+        "applicant_token",
+        "paymentReference"
+      ],
+      "body": {
+        "type": "license_upgrade_payment",
+        "drivingSchoolId": "14",
+        "password": "Password@1234",
+        "email": "${studentEmailDrivingSchool}",
+        "currency": "NGN",
+        "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
+        "failureRedirectUrl": "http://localhost:4200/staging/payment-failed?",
+        "description": "license_upgrade_payment"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "extract": {
+        "paymentReference": "reference"
+      },
+      "expectedResults": []
+    },
+    {
+      "story": "verify payment",
+      "name": "verify payment after client has been redirected. This sets the payment to completed if successfully verified.",
+      "method": "POST",
+      "path": "payments/verify",
+      "requires": [
+        "applicant_token",
+        "paymentReference"
+      ],
+      "body": {
+        "type": "license_upgrade_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "validate payment",
+      "path": "payments/validate-transaction",
+      "method": "POST",
+      "name": "Validate the status of a transaction",
+      "body": {
+        "type": "license_upgrade_payment",
+        "reference": "${paymentReference}"
+      },
+      "assertions": {
+        "status": 404
+      }
+    },
+    {
+      "story": "CBT Test",
+      "name": "Verify application number",
+      "method": "POST",
+      "path": "driving-school/check-application",
+      "requires": [
+        "applicant_token"
+      ],
+      "body": {
+        "applicationId": "${applicationId}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Applicant should successfully verify application number"
+      ]
+    },
+    {
+      "story": "NIN verification",
+      "name": "Verify application NIN via face capture/face match",
+      "method": "GET",
+      "path": "auth/verify-nin/94148931536",
+      "assertions": {
+        "status": 200
+      },
+      "expectedResults": [
+        "Applicant should successfully verify nin and face match"
+      ]
+    },
+    {
+      "story": "CBT Questions",
+      "name": "Get questions by student",
+      "method": "POST",
+      "path": "cbt/question/by-student",
+      "body": {
+        "certificateNo": "${certificateNo}"
+      },
+      "assertions": {
+        "status": 201
+      },
+      "expectedResults": [
+        "Applicant should be able to access their questions"
+      ]
+    },
+    {
+      "story": "CBT Submission",
+      "name": "Submit student test",
+      "method": "POST",
+      "path": "cbt/question/submit-test",
+      "body": {
+        "answers": {
+          "67": "A",
+          "68": "A",
+          "69": "A",
+          "70": "A",
+          "71": "A",
+          "72": "A",
+          "73": "A",
+          "74": "A",
+          "75": "A",
+          "76": "A",
+          "77": "A",
+          "78": "A",
+          "79": "A",
+          "80": "A",
+          "81": "A",
+          "82": "A",
+          "83": "A",
+          "84": "A",
+          "85": "A",
+          "86": "A",
+          "87": "A",
+          "88": "A",
+          "89": "A",
+          "90": "A",
+          "91": "A",
+          "92": "A",
+          "93": "A",
+          "94": "A",
+          "95": "A",
+          "96": "A",
+          "97": "A",
+          "98": "A",
+          "99": "A",
+          "100": "A",
+          "101": "A",
+          "102": "A",
+          "103": "A",
+          "104": "A",
+          "105": "A",
+          "106": "A",
+          "107": "A",
+          "108": "A",
+          "109": "A",
+          "110": "A",
+          "111": "A",
+          "112": "A",
+          "113": "A",
+          "114": "A",
+          "115": "A",
+          "116": "A",
+          "117": "A"
+        },
+        "certificateNo": "${certificateNo}"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Driving Test Schedule page",
+      "name": "Applicant accesses the Driving Test schedule page",
+      "method": "GET"
+    },
+    {
+      "story": "Driving Test Schedule page",
+      "name": "Applicant accesses the Driving Test schedule page",
+      "method": "GET",
+      "path": "notifications/unread-count",
+      "requires": [
+        "applicant_token"
+      ],
+      "assertions": {
+        "status": 200
+      }
+    },
+    {
+      "story": "Driving Test Centres",
+      "name": "Get list of driving test centres",
+      "method": "GET",
+      "path": "driving-test/centers",
+      "assertions": {
+        "status": 200
+      },
+      "requires": [
+        "applicant_token"
+      ],
+      "extract": {
+        "drivingTestCenterID": "data.result[0].id"
+      },
+      "expectedResults": [
+        "Applicant should successfully get list of driving test centres"
+      ]
+    },
+    {
+      "story": "Driving Test Slots",
+      "name": "Get driving test slot",
+      "method": "POST",
+      "path": "driving-test/slots",
+      "body": {
+        "drivingTestCenterId": "${drivingTestCenterID|number}"
+      },
+      "requires": [
+        "drivingTestCenterID",
+        "applicant_token"
+      ],
+      "extract": {
+        "availableSlotDate": "data.availableSlots[0].date",
+        "availableSlotTime": "data.availableSlots[0].times[0]"
+      },
+      "assertions": {
+        "status": 201
+      }
+    },
+    {
+      "story": "Book slot",
+      "name": "Book driving test slot",
+      "method": "POST",
+      "path": "driving-test/book-slot",
+      "requires": [
+        "applicant_token",
+        "availableSlotDate",
+        "availableSlotTime"
+      ],
+      "body": {
+        "drivingTestCenterId": "${drivingTestCenterID|number}",
+        "studentId": 0,
+        "stateId": 25,
+        "lgaId": 504,
+        "date": "${availableSlotDate}",
+        "time": "${availableSlotTime}"
+      }
+    },
+    {
+      "story": "Schedule test",
+      "name": "Schedule driving test",
+      "method": "POST",
+      "path": "driving-test/v4/schedule-test",
+      "requires": [
+        "applicant_token"
+      ],
+      "body": {
+        "certificateNo": "${certificateNo}",
+        "stateId": 25,
+        "lgaId": 504,
+        "date": "${availableSlotDate}",
+        "time": "${availableSlotTime}",
+        "years": 0,
+        "drivingTestCenterId": "${drivingTestCenterID|number}",
+        "successRedirectUrl": "http://localhost:4200/new-registration-confirmation?",
+        "failureRedirectUrl": "http://localhost:4200/staging/payment-failed?"
+      }
+    },
+    {
+      "story": "DVIS officer login",
+      "name": "DVIS officer logs into mobile app account",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "agyakoji+30@gmail.com",
+        "password": "t3we1i8y"
+      },
+      "extract": {
+        "dvis_officer_token": "accessToken"
+      },
+      "assertions": {},
+      "expectedResults": [
+        "DVIS Officer should successfully login"
+      ]
+    },
+    {
+      "story": "Capture biometric",
+      "name": "DVIS officer does fingerprint for verification",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "body": {
+        "email": "agyakoji+30@gmail.com",
+        "files": [
+          {
+            "documenType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      }
+    },
+    {
+      "story": "Contact validation",
+      "name": "Send OTP to supplied email or phone",
+      "method": "POST",
+      "path": "auth/send-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "phone": "${drivingSchoolPhone}"
+      }
+    },
+    {
+      "story": "Receive OTP",
+      "name": "Validate OTP sent to supplied email or phone",
+      "method": "POST",
+      "path": "auth/validate-otp",
+      "body": {
+        "email": "${studentEmailDrivingSchool}",
+        "phone": "${drivingSchoolPhone}",
+        "otp": "123456"
+      }
+    },
+    {
+      "story": "Certificate validation",
+      "name": "Validate the certificate number",
+      "method": "POST",
+      "path": "driving-school/validate-cert-no",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "body": {
+        "certificateNo": "${certificateNo}"
+      }
+    },
+    {
+      "story": "Face match",
+      "name": "Verify applicant NIN via face capture/face mat",
+      "method": "GET",
+      "path": "auth/verify-nin/94148931536",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "assertions": {},
+      "expectedResults": [
+        "Applicant's face should  be successful"
+      ]
+    },
+    {
+      "story": "submit test",
+      "name": "Submit driving test",
+      "method": "POST",
+      "path": "driving-test/submit-driving-test",
+      "requires": [
+        "dvis_officer_token"
+      ],
+      "body": {
+        "answers": [
+          "string"
+        ],
+        "licenseClassId": 1,
+        "certificateNo": "${certificateNo}",
+        "score": 0,
+        "files": [
+          "string"
+        ],
+        "vehicleType": "string",
+        "location": "string",
+        "reference": "string",
+        "transactionId": 0,
+        "drivingTestCenterId": "${drivingTestCenterID|number}"
+      }
+    },
+    {
+      "story": "Biometric Schedule page",
+      "name": "Applicant accesses the biometrics schedule page",
+      "method": "GET",
+      "path": "notifications/unread-count",
+      "requires": [
+        "applicant_token"
+      ]
+    },
+    {
+      "story": "Biometrics Centres",
+      "name": "Get list of driving test centres",
+      "method": "GET",
+      "path": "biometrics/centers",
+      "assertions": {},
+      "requires": [
+        "applicant_token"
+      ],
+      "expectedResults": [
+        "Applicant should successfully get list of biometric centres"
+      ]
+    },
+    {
+      "story": "Biometrics slots",
+      "name": "Get biometrics slot",
+      "method": "POST",
+      "path": "biometrics/slots",
+      "body": {
+        "centerId": 1
+      },
+      "extract": {
+        "availableSlotDate": "data.availableSlots[0].date",
+        "availableSlotTime": "data.availableSlots[0].times[0]"
+      }
+    },
+    {
+      "story": "Schedule biometrics",
+      "name": "Schedule biometrics capture for applicant",
+      "method": "POST",
+      "path": "biometrics/schedule-applicant-biometrics",
+      "body": {
+        "licenseRequestId": 1,
+        "centerId": 1,
+        "stateId": 25,
+        "lgaId": 518,
+        "date": "${availableSlotDate}",
+        "time": "${availableSlotTime}"
+      }
+    },
+    {
+      "story": "MVAA officer login",
+      "name": "MVAA officer logs into mobile app account",
+      "method": "POST",
+      "path": "auth/login",
+      "body": {
+        "email": "agyakoji+500@gmail.com",
+        "password": "Password@1234"
+      },
+      "extract": {
+        "mvaa_officer_token": "accessToken"
+      },
+      "assertions": {},
+      "expectedResults": [
+        "MVAA Officer should successfully login"
+      ]
+    },
+    {
+      "story": "Capture MVAA officer's biometric",
+      "name": "MVAA officer does fingerprint for verification",
+      "method": "POST",
+      "path": "users/update-biometrics",
+      "requires": [
+        "mvaa_officer_token"
+      ],
+      "body": {
+        "email": "agyakoji+50@gmail.com",
+        "files": [
+          {
+            "documenType": "finger",
+            "fingerType": "right_thumb",
+            "fileId": 1
+          }
+        ]
+      }
+    },
+    {
+      "story": "Certificate validation",
+      "name": "Validate the certificate number",
+      "method": "POST",
+      "requires": [
+        "mvaa_officer_token"
+      ],
+      "path": "driving-school/validate-cert-no",
+      "body": {
+        "certificateNo": "${certificateNo}"
+      }
+    },
+    {
+      "story": "Applicant details",
+      "name": "Get applicant details",
+      "method": "GET",
+      "path": "driving-school/applicant/details/${applicationId}",
+      "requires": [
+        "mvaa_officer_token",
+        "applicationID"
+      ],
+      "assertions": {},
+      "expectedResults": [
+        "Applicant's details should display successfully"
+      ]
+    },
+    {
+      "story": "Submit license request",
+      "name": "Submit new license request",
+      "method": "POST",
+      "path": "biometrics/submit-biometric-results",
+      "requires": [
+        "mvaa_officer_token"
+      ],
+      "body": {
+        "licenseRequestId": 1,
+        "status": "passed",
+        "files": [
+          {
+            "fileId": 0,
+            "documentType": "string",
+            "fingerType": "string"
+          }
+        ],
+        "notes": "Biometric capture completed successfully"
+      }
+    },
+    {
+      "story": "Generate License",
+      "name": "Generate new license",
+      "method": "GET",
+      "path": "license/generate-license/${licenseNo}",
+      "requires": [
+        "licenseNo"
+      ],
+      "assertions": {},
+      "expectedResults": [
+        "License should be successfully generated"
+      ]
+    }
+  ]
+}

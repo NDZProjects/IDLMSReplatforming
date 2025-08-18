@@ -2,11 +2,15 @@
   "../auth_flows/lasdri_admin.json",
   "../auth_flows/lasdri_officer.json",
   "../auth_flows/school_admin.json",
-  "Student_driving_school_account_creation.json",
+  "student_driving_school_account_creation.json",
   "student_driving_training_enrolment_flow.json",
   "acknowledge_driving_lesson_application_flow.json",
   "school_portal_certify_student.json",
   "dsportal_student_driving_training_enrollment.json",
   "school_portal_certify_student.json",
-  "driving_school_onboarding_flow.json"
+  "driving_school_onboarding_flow.json",
+  "new_driving_license_request.json",
+  "license_reissue.json",
+  "license_renewal.json",
+  "license_upgrade.json"
 ]
