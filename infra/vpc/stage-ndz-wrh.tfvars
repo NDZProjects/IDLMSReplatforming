@@ -6,6 +6,7 @@ tf_state_bucket      = "stage-ndz-wrh-btl-idlms-backend-api-tfstate-014125597127
 ami_id               = "ami-01f23391a59163da9"
 docker_artifact_bucket = "idlms-stage-ndz-wrh-built-artifact-014125597127"
 app_ports = [4000, 4001, 4002]
+db_port = 5432
 enable_dns_support   = true
 enable_dns_hostnames = true
 vpc_name             = "stage-ndz-wrh-idlms-vpc"

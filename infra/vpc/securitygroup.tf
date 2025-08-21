@@ -15,6 +15,15 @@ resource "aws_security_group" "open_ssh_and_app" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
+  # Postgress DB Port
+  ingress {
+    description = "Postgress Database"
+    from_port   = var.db_port
+    to_port     = var.db_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   # Dynamic app ports from var.app_ports
   dynamic "ingress" {

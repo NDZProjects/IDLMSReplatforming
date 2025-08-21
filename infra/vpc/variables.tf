@@ -187,3 +187,7 @@ variable "app_ports" {
 
 }
 
+variable "db_port" {
+  description = "Port oif the database instance"
+  type = number
+}

@@ -6,6 +6,7 @@ tf_state_bucket      = "rpi-dev-btl-idlms-backend-api-tfstate-756718255547"
 ami_id               = "ami-01f23391a59163da9"
 docker_artifact_bucket = "idlms-rpi-dev-built-artifact-756718255547"
 app_ports = [4000, 4001, 4002]
+db_port = 5432
 enable_dns_support   = true
 enable_dns_hostnames = true
 vpc_name             = "rpi-dev-idlms-vpc"

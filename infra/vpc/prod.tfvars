@@ -5,6 +5,7 @@ ec2_ssm_role_name    = "ec2_ssm_role-prod"
 tf_state_bucket      = "my-terraform-state-bckt4321"
 ami_id               = "ami-020cba7c55df1f615"
 app_ports = [4000, 4001, 4002]
+db_port = 5432
 docker_artifact_bucket = "idlms-website-built-artifact"
 
 enable_dns_support   = true

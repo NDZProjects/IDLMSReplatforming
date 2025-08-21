@@ -6,6 +6,7 @@ tf_state_bucket      = "{{env}}-btl-idlms-backend-api-tfstate"
 ami_id               = "ami-01f23391a59163da9"
 docker_artifact_bucket = "{{env}}-idlms-website-built-artifact"
 app_ports = [4000, 4001, 4002]
+db_port = 5432
 enable_dns_support   = true
 enable_dns_hostnames = true
 vpc_name             = "{{env}}-idlms-vpc"
