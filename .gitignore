@@ -1,0 +1,27 @@
+# Terraform
+**/.terraform/
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+# Archives / binaries
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.jar
+*.exe
+*.dmg
+*.iso
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
